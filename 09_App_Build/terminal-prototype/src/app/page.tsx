@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic";
 
-const HaroldTerminal = dynamic(
-  () => import("@/components/HaroldTerminal"),
+const MobileTerminal = dynamic(
+  () => import("@/components/MobileTerminal"),
   { ssr: false }
 );
 
 export default function Home() {
-  return <HaroldTerminal />;
+  return <MobileTerminal />;
 }

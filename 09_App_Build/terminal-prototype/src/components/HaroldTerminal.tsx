@@ -67,6 +67,8 @@ export default function HaroldTerminal() {
   const [rpDisplay, setRpDisplay] = useState(0);
   const [levelDisplay, setLevelDisplay] = useState("Rookie");
   const [showPass, setShowPass] = useState(false);
+  const [mobileChoices, setMobileChoices] = useState<{ key: string; label: string }[]>([]);
+  const [waitingMobile, setWaitingMobile] = useState(false);
 
   const updateRP = useCallback((rp: number) => {
     setRpDisplay(rp);
@@ -131,6 +133,9 @@ export default function HaroldTerminal() {
     });
     t.writeln("");
     t.write(`  \x1b[90m▶ Enter choice: \x1b[0m`);
+    // Mobile tap buttons
+    setMobileChoices(choices.map((c) => ({ key: c.key, label: c.label })));
+    setWaitingMobile(true);
   }, []);
 
   const showStage = useCallback(
@@ -239,6 +244,8 @@ export default function HaroldTerminal() {
 
       state.answers[stage.id] = choice.label;
       state.waitingForInput = false;
+      setWaitingMobile(false);
+      setMobileChoices([]);
 
       const nextId = choice.next ?? stage.next;
       if (nextId) {
@@ -296,21 +303,31 @@ export default function HaroldTerminal() {
   useEffect(() => {
     if (!termRef.current) return;
 
+    const isMobile = window.innerWidth < 768;
+
     const t = new Terminal({
       fontFamily: '"Courier New", "Lucida Console", monospace',
-      fontSize: 14,
+      fontSize: isMobile ? 11 : 14,
       lineHeight: 1.4,
       theme: THEME,
       cursorBlink: true,
       cursorStyle: "block",
       scrollback: 2000,
       convertEol: true,
+      allowProposedApi: true,
     });
 
     const fitAddon = new FitAddon();
     t.loadAddon(fitAddon);
     t.open(termRef.current);
-    fitAddon.fit();
+
+    // Delay fit to ensure DOM dimensions are ready (critical on mobile)
+    const doFit = () => {
+      try { fitAddon.fit(); } catch (_) { /* ignore if not ready */ }
+    };
+    doFit();
+    const fitTimer = setTimeout(doFit, 100);
+    const fitTimer2 = setTimeout(doFit, 500);
 
     term.current = t;
     fit.current = fitAddon;
@@ -329,12 +346,19 @@ export default function HaroldTerminal() {
       }
     });
 
-    const handleResize = () => fitAddon.fit();
+    const handleResize = () => {
+      try { fitAddon.fit(); } catch (_) { /* ignore */ }
+    };
     window.addEventListener("resize", handleResize);
+    // Mobile orientation change
+    window.addEventListener("orientationchange", () => setTimeout(handleResize, 300));
 
-    showStage(t, harold[0]);
+    // Start after first fit settles
+    setTimeout(() => showStage(t, harold[0]), 150);
 
     return () => {
+      clearTimeout(fitTimer);
+      clearTimeout(fitTimer2);
       window.removeEventListener("resize", handleResize);
       t.dispose();
     };
@@ -368,7 +392,41 @@ export default function HaroldTerminal() {
       </div>
 
       {/* Terminal */}
-      <div ref={termRef} className="flex-1 p-2" />
+      <div
+        ref={termRef}
+        style={{ flex: 1, minHeight: 0, padding: "4px", overflow: "hidden" }}
+      />
+
+      {/* Mobile tap choices */}
+      {waitingMobile && mobileChoices.length > 0 && (
+        <div
+          className="flex flex-col gap-1 p-2"
+          style={{ background: BLACK, borderTop: `1px solid ${AMBER_DIM}` }}
+        >
+          {mobileChoices.map((c) => (
+            <button
+              key={c.key}
+              onClick={() => {
+                if (!term.current || !stateRef.current.waitingForInput) return;
+                const stage = harold[stateRef.current.stageIndex];
+                if (stage?.type === "choice") {
+                  setWaitingMobile(false);
+                  setMobileChoices([]);
+                  handleChoice(term.current, stage, c.key);
+                }
+              }}
+              className="text-left text-xs py-2 px-3 font-mono"
+              style={{
+                border: `1px solid ${AMBER_DIM}`,
+                color: AMBER,
+                background: BLACK,
+              }}
+            >
+              [{c.key}] {c.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
