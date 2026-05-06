@@ -1,0 +1,10 @@
+﻿# Logs
+mirror_log.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.bak
