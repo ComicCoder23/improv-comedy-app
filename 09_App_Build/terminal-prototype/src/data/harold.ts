@@ -54,7 +54,7 @@ export const harold: Stage[] = [
   // ── INTRO ─────────────────────────────────────────────────────────────
   {
     id: "intro",
-    type: "narrative",
+    type: "choice",
     lines: [
       "  ┌─────────────────────────────────────────┐",
       "  │   THE CENTRAL SCOTLAND IMPROV SCENE MAP  │",
