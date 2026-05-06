@@ -8,3 +8,6 @@ Thumbs.db
 # Editor
 .vscode/
 *.bak
+
+# Dependencies
+node_modules/
