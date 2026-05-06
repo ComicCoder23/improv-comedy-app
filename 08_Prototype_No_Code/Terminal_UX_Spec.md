@@ -1,9 +1,10 @@
 ﻿# Questionnaire UX — Terminal Experience Spec
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 2026-05-06
 **Source:** Gemini CLI brief + Claude Code integration
 **Status:** Planned — script complete, technical build pending
+**Identity:** Anonymous. Creator is The Stage Manager. No real name attached to anything.
 
 ---
 
@@ -117,12 +118,39 @@ This is v1 — locked. Do not overwrite. Branch or create v2 if changes needed.
 
 ---
 
+## Anonymous Rollout Strategy
+
+**Identity:** The Stage Manager. Already embedded in the Harold script. No creator name, no app name, no face.
+
+**Why:** The Glasgow improv scene is tight. If the community knows who built it, it becomes "that person's thing." Anonymous, it becomes the scene's thing. The "who made this?" conversation is the first wave of marketing.
+
+**The Stage Manager as brand:**
+- All terminal output is voiced by The Stage Manager
+- Security pass says "Approved by The Stage Manager"
+- No social profile photo — just the terminal aesthetic
+- Handle options if social needed: @thestagemanager / @scenemap / @centralscotimprov
+- Zero creator credit anywhere in the experience
+
+**Seeding:**
+- Link dropped into WhatsApp group(s) by a trusted third party — not the creator
+- Framed as "anyone seen this?" not "I made this"
+- The terminal experience should feel like it discovered itself
+
+**The reveal:**
+- Timed to app launch or when Founding Cast hits a meaningful number
+- The reveal IS an event — a second wave of hype built on the mystery of the first
+- The Stage Manager steps out. The scene map goes live.
+
+**Rule:** No agent, file, commit message, or public-facing asset should name the creator of this project until Alan explicitly authorises the reveal.
+
+---
+
 ## Pending Before Build
 
 - User to review Harold script and add personal jokes / specific bits
 - YouTube channel analysis (voice/humour tone) — was pending from Gemini session
 - Decision: green-on-black or amber-on-black terminal colour
-- Decision: stage name on security pass — yes or no
+- Security pass says "Approved by The Stage Manager" — confirmed anonymous
 
 ---
 
