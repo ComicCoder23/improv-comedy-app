@@ -5,6 +5,7 @@ import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import { harold, getLevel, Stage } from "@/data/harold";
+import SecurityPass from "@/components/SecurityPass";
 
 const AMBER = "#FFB300";
 const AMBER_DIM = "#996800";
@@ -65,6 +66,7 @@ export default function HaroldTerminal() {
   });
   const [rpDisplay, setRpDisplay] = useState(0);
   const [levelDisplay, setLevelDisplay] = useState("Rookie");
+  const [showPass, setShowPass] = useState(false);
 
   const updateRP = useCallback((rp: number) => {
     setRpDisplay(rp);
@@ -163,7 +165,9 @@ export default function HaroldTerminal() {
           `  \x1b[32mFinal RP: ${state.rp} — ${getLevel(state.rp)}\x1b[0m`
         );
         t.writeln("");
-        // Tally popup fires on the "tally" stage (handled below via id check)
+        if (stage.id === "complete_member") {
+          setTimeout(() => setShowPass(true), 800);
+        }
         return;
       }
 
@@ -338,6 +342,13 @@ export default function HaroldTerminal() {
 
   return (
     <div className="flex flex-col h-screen w-screen bg-black">
+      {showPass && (
+        <SecurityPass
+          rp={rpDisplay}
+          level={levelDisplay}
+          onClose={() => setShowPass(false)}
+        />
+      )}
       {/* Status bar */}
       <div
         className="flex items-center justify-between px-4 py-1 text-xs font-mono border-b"
