@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { harold, getLevel, Stage, Choice } from "@/data/harold";
 import SecurityPass from "@/components/SecurityPass";
+import PuggyMachine from "@/components/PuggyMachine";
 
 const AMBER = "#FFB300";
 const AMBER_DIM = "#7A5C00";
@@ -37,6 +38,8 @@ export default function MobileTerminal() {
   const [rp, setRp] = useState(0);
   const [level, setLevel] = useState("Rookie");
   const [showPass, setShowPass] = useState(false);
+  const [showPuggy, setShowPuggy] = useState(false);
+  const [questionCount, setQuestionCount] = useState(0);
   const [inputMode, setInputMode] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [inputKey, setInputKey] = useState("");
@@ -135,7 +138,7 @@ export default function MobileTerminal() {
 
         // Tally popup at the button step
         if (stage.id === "tally") {
-          const tally = (window as Record<string, unknown>).Tally as
+          const tally = (window as unknown as Record<string, unknown>).Tally as
             | { openPopup: (id: string, opts: unknown) => void }
             | undefined;
           try {
@@ -155,6 +158,12 @@ export default function MobileTerminal() {
       if (!isWaiting) return;
       setChoices([]);
       setIsWaiting(false);
+
+      setQuestionCount((prev) => {
+        const next = prev + 1;
+        if (next % 5 === 0) setShowPuggy(true);
+        return next;
+      });
 
       addLine(`  ▶ ${choice.label}`, AMBER_DIM);
 
@@ -208,13 +217,20 @@ export default function MobileTerminal() {
 
   return (
     <div
-      className="flex flex-col font-mono"
       style={{
-        height: "100dvh",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: "flex",
+        flexDirection: "column",
+        fontFamily: '"Courier New", "Lucida Console", Courier, monospace',
         background: BLACK,
         color: AMBER,
         userSelect: "none",
         WebkitUserSelect: "none",
+        overflowY: "hidden",
       }}
     >
       {/* Security pass overlay */}
@@ -222,11 +238,28 @@ export default function MobileTerminal() {
         <SecurityPass rp={rp} level={level} onClose={() => setShowPass(false)} />
       )}
 
+      {/* Puggy Machine overlay — fires every 5th choice */}
+      {showPuggy && (
+        <PuggyMachine
+          tokens={3}
+          onComplete={(rpEarned) => {
+            if (rpEarned > 0) updateRp(rpRef.current + rpEarned);
+            setShowPuggy(false);
+          }}
+          onClose={() => setShowPuggy(false)}
+        />
+      )}
+
       {/* Status bar */}
       <div
-        className="flex-shrink-0 flex items-center justify-between px-3 py-1 text-xs border-b"
         style={{
-          borderColor: AMBER_DIM,
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "4px 12px",
+          fontSize: "11px",
+          borderBottom: `1px solid ${AMBER_DIM}`,
           color: AMBER_DIM,
           background: BLACK,
           letterSpacing: "0.05em",
@@ -243,8 +276,12 @@ export default function MobileTerminal() {
       {/* Scrollable terminal output */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-3 py-2"
-        style={{ minHeight: 0 }}
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "8px 12px",
+          minHeight: 0,
+        }}
       >
         {lines.map((line) => (
           <div
@@ -279,8 +316,13 @@ export default function MobileTerminal() {
       {/* Text input mode */}
       {inputMode && (
         <div
-          className="flex-shrink-0 flex gap-2 p-3 border-t"
-          style={{ borderColor: AMBER_DIM }}
+          style={{
+            flexShrink: 0,
+            display: "flex",
+            gap: "8px",
+            padding: "12px",
+            borderTop: `1px solid ${AMBER_DIM}`,
+          }}
         >
           <input
             ref={inputRef}
@@ -308,8 +350,15 @@ export default function MobileTerminal() {
       {/* Choice buttons */}
       {isWaiting && choices.length > 0 && (
         <div
-          className="flex-shrink-0 flex flex-col gap-1.5 p-3 border-t"
-          style={{ borderColor: AMBER_DIM, background: "#050500" }}
+          style={{
+            flexShrink: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: "6px",
+            padding: "12px",
+            borderTop: `1px solid ${AMBER_DIM}`,
+            background: "#050500",
+          }}
         >
           {choices.map((c) => (
             <button
