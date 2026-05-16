@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
 
@@ -7,14 +8,21 @@ export const metadata: Metadata = {
   description: "A Harold in terminal form. Central Scotland Improv Scene.",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full bg-black">
-      <body className="h-full w-full flex flex-col overflow-hidden bg-black">
+    <html lang="en" style={{ height: "100%", background: "#0A0A00" }}>
+      <body style={{ height: "100%", margin: 0, padding: 0, background: "#0A0A00", overflow: "hidden" }}>
         {children}
         <Script
           id="tally-js"

@@ -15,21 +15,25 @@ const BLACK = "#0A0A00";
 const RED = "#FF2222";
 
 export default function SecurityPass({ rp, level, onClose }: Props) {
-  const [visible, setVisible] = useState(false);
-  const [backstageUrl, setBackstageUrl] = useState("https://scene-map.vercel.app/backstage");
+  const [backstageUrl, setBackstageUrl] = useState("/backstage");
 
   useEffect(() => {
-    setTimeout(() => setVisible(true), 80);
-    setBackstageUrl(`${window.location.origin}/backstage`);
+    const host = window.location.host;
+    const protocol = window.location.protocol;
+    setBackstageUrl(`${protocol}//${host}/backstage`);
   }, []);
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center z-50 p-4"
       style={{
-        background: "rgba(0,0,0,0.92)",
-        opacity: visible ? 1 : 0,
-        transition: "opacity 0.4s ease",
+        position: "fixed",
+        inset: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "16px",
+        background: "rgba(0,0,0,0.95)",
+        zIndex: 99999,
       }}
     >
       {/* Pass card */}
